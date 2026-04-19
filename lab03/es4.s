@@ -25,7 +25,7 @@ main:
         addi    a7, x0, 63
         ecall
 
-        beq     a0, s0, read_digits     # skip the remove of newline if the buffer is full
+        bgt     a0, s0, read_digits     # skip the remove of newline if the buffer is full
         addi    a0, a0, -1              # remove the character newline
 
 read_digits:
@@ -42,11 +42,11 @@ loop:
         and     t2, t2, t3
         beq     t2, x0, print_error
 
-        mul     t5, t4, s10
-        bgt     t4, t5, print_overflow  # check overflow in the multiplication
-        
-        add     t4, t5, t1
-        addi    t4, t4, -48
+        mul     t5, t4, s10             # accumulator * 10
+        add     t5, t5, t1              # accumulator + last digit
+        addi    t5, t5, -48             # remove '0' to convert in integer from ASCII
+        bgtu    t4, t5, print_overflow  # check overflow
+        add     t4, t5, x0              # move temp value in the accumulator
 
         addi    a1, a1, 1
         addi    a0, a0, -1
@@ -65,6 +65,9 @@ print_overflow:
         j       exit
 
 print_ok:
+        la      t0, number
+        sw      t4, 0(t0)
+
         la      a0, ok
         addi    a7, x0, 4
         ecall

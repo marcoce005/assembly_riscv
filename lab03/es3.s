@@ -23,7 +23,7 @@ main:
         addi    a7, x0, 63
         ecall
 
-        beq     a0, s0, read_digits     # skip the remove of newline if the buffer is full
+        bgt     a0, s0, read_digits     # skip the remove of newline if the buffer is full
         addi    a0, a0, -1              # remove the character newline
 
 read_digits:

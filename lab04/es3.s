@@ -3,6 +3,11 @@ opa:    .word   2043
 opb:    .word   5
 input:  .string "Insert the operand\n. + --> 1\n. - --> 2\n. * --> 3\n. / --> 4\n --> "
 error:  .string "Wrong input\n"
+plus:   .string " + "
+minus:  .string " - "
+prod:   .string " * "
+divis:  .string " / "
+equal:  .string " = "
 
 .bss
 res:    .zero   4
@@ -38,6 +43,17 @@ main:
         and     t2, t0, t1
         beqz    t2, print_error
 
+        la      t0, opa
+        lw      s1, 0(t0)               # s1 <-- opa
+        la      t0, opb
+        lw      s2, 0(t0)               # s2 <-- opb
+        la      s3, res
+
+        mv      a0, s1                  # print first number
+        addi    a7, x0, 1
+        ecall
+
+# switch case using array of cases
         slli    s0, s0, 2
         la      t0, table
         add     t0, t0, s0
@@ -45,17 +61,41 @@ main:
         jr      t1
 
 somma:
-        addi    s11, x0, 69
-        j       exit
+        add     s4, s1, s2
+        la      a0, plus
+        addi    a7, x0, 4
+        ecall
+        j       print
 sottrazione:
-        addi    s11, x0, 67
-        j       exit
+        sub     s4, s1, s2
+        la      a0, minus
+        addi    a7, x0, 4
+        ecall
+        j       print
 prodotto:
-        addi    s11, x0, 1
-        j       exit
+        mul     s4, s1, s2
+        la      a0, prod
+        addi    a7, x0, 4
+        ecall
+        j       print
 divisione:
-        addi    s11, x0, 70
+        div     s4, s1, s2
+        la      a0, divis
+        addi    a7, x0, 4
+        ecall
 
+print:
+        sw      s4, 0(s3)
+        
+        mv      a0, s2
+        addi    a7, x0, 1
+        ecall
+        la      a0, equal
+        addi    a7, x0, 4
+        ecall
+        mv      a0, s4
+        addi    a7, x0, 1
+        ecall
 
 exit:
         addi    a7, x0, 10

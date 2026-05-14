@@ -271,17 +271,28 @@ Stack:          Grows downward. Must be 16-byte aligned when making a call.
 > (if required), then execute `ecall`. For v2.1.0+, the complete list is also in
 > **Help → System calls** inside the application.
 
-| `a7` | Name             | `a0` input              | Description |
-|------|------------------|-------------------------|-------------|
-| `1`  | `print_int`      | signed integer          | Prints `a0` as a signed decimal number (e.g. `-42`). |
-| `2`  | `print_float`    | float (bits in `a0`)    | Prints `a0` interpreted as a 32-bit IEEE 754 float. |
-| `4`  | `print_string`   | address of string       | Prints the null-terminated string stored at the address in `a0`. The string must end with `\0` (use `.string`, not `.ascii`). |
-| `10` | `exit`           | —                       | Halts the simulation immediately. Always call this at the end of your program. |
-| `11` | `print_char`     | ASCII code (0–127)      | Prints the character corresponding to the ASCII value in `a0` (e.g. `65` → `A`). |
-| `34` | `print_hex`      | integer                 | Prints `a0` as a hexadecimal number with `0x` prefix (e.g. `0xFF`). Useful for debugging memory addresses. |
-| `35` | `print_bin`      | integer                 | Prints `a0` in binary with `0b` prefix (e.g. `0b1010`). Useful for inspecting bit patterns. |
-| `36` | `print_unsigned` | unsigned integer        | Prints `a0` as an unsigned decimal (0 to 4294967295). Use instead of `print_int` when the value must not be interpreted as negative. |
-| `93` | `exit2`          | exit status code        | Halts the simulator and reports the exit code in `a0`. Equivalent to `exit(code)` in C. |
+| `a7` | Name                 | `a0` input                          | Description |
+|------|----------------------|-------------------------------------|-------------|
+| `0`  | `none`               | -                                   | No operation |
+| `1`  | `print_int`          | signed integer                      | Prints `a0` as a signed decimal number (e.g. `-42`). |
+| `2`  | `print_float`        | float                               | Prints `a0` as a floating point number. |
+| `4`  | `print_str`          | pointer to string                   | Prints the null-terminated string pointed by `a0`. |
+| `10` | `exit`               | -                                   | Terminates the program. |
+| `11` | `print_char`         | ASCII character                     | Prints the character in `a0`. |
+| `17` | `get_cwd`            | buffer address                      | Writes current working directory into buffer (`a1` = buffer size). |
+| `30` | `time_ms`            | -                                   | Returns current time in milliseconds. |
+| `31` | `cycles`             | -                                   | Returns the number of CPU cycles. |
+| `34` | `print_int_hex`      | integer                             | Prints `a0` in hexadecimal format. |
+| `35` | `print_int_binary`   | integer                             | Prints `a0` in binary format. |
+| `36` | `print_int_unsigned` | unsigned integer                    | Prints `a0` as an unsigned decimal number. |
+| `57` | `close`              | file descriptor                     | Closes the file descriptor in `a0`. |
+| `62` | `lseek`              | file descriptor                     | Moves file position (`a1` = offset, `a2` = whence: 0=start, 1=current, 2=end). |
+| `63` | `read`               | file descriptor                     | Reads bytes into memory (`a1` = buffer, `a2` = length). |
+| `64` | `write`              | file descriptor                     | Writes bytes from memory (`a1` = buffer, `a2` = length). |
+| `80` | `fstat`              | file descriptor                     | Gets file info (`a1` = struct pointer). Currently stub (returns 0). |
+| `93` | `exit2`              | exit code                           | Terminates program with return code. |
+| `214`| `brk`                | address                             | Adjusts program break (heap end). |
+| `1024`| `open`              | pointer to path string              | Opens file (`a1` = flags) and returns file descriptor. |
 
 ---
 

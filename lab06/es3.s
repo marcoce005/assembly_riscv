@@ -2,6 +2,7 @@
 n:      .word   19
 output: .string "Collatz sequence from "
 end_output: .string ":\n"
+tot_num: .string "\nNumber of items: "
 
 .text
 main:
@@ -21,15 +22,25 @@ main:
         mv      a0, s0
         addi    s1, x0, 1               # s1 <--- 1 the lower bound
         jal     collatz_seq
+        mv      s2, a0
+
+        la      a0, tot_num
+        addi    a7, x0, 4
+        ecall
+        mv      a0, s2
+        addi    a7, x0, 1
+        ecall
 
         j       exit
 
 
 collatz_seq:
-        addi    sp, sp, -8
-        sw      ra, 4(sp)
-        sw      t0, 0(sp)
+        addi    sp, sp, -12
+        sw      ra, 8(sp)
+        sw      t0, 4(sp)
+        sw      t1, 0(sp)
         
+        addi    t1, x0, 1
 loop:
         mv      t0, a0
         addi    a7, x0, 1
@@ -41,12 +52,17 @@ loop:
         mv      a0, t0
         jal     cal_next
 
+        addi    t1, t1, 1
         bne     a0, s1, loop
 
         addi    a7, x0, 1
         ecall
-        lw      ra, 4(sp)
-        lw      t0, 0(sp)
+
+        mv      a0, t1
+
+        lw      ra, 8(sp)
+        lw      t0, 4(sp)
+        lw      t1, 0(sp)
         addi    sp, sp, 8
         jr      ra
 
